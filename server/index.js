@@ -8,6 +8,7 @@ app.use(cors());
 app.get("/", async (req, res) => {
   res.send("hello world");
 });
+app.use("/api/v1/auth", require("./routes/auth.js"));
 const startServer = async () => {
   try {
     await connectDB(process.env.MONGODB_URL);
