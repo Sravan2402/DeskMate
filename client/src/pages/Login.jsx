@@ -1,20 +1,18 @@
 import React, { useState, useEffect, use } from "react";
 import { useNavigate } from "react-router-dom";
+import {
+  Monitor,
+  Users,
+  Settings,
+  HelpCircle,
+  LogOut,
+  ShieldAlert,
+} from "lucide-react";
 const Logo = () => (
-  <div className="inline-flex items-center justify-center w-14 h-14 md:w-16 md:h-16 bg-gradient-to-br from-violet-600 to-indigo-600 rounded-2xl shadow-xl shadow-indigo-500/20 mb-4 md:mb-5 text-white transform hover:rotate-3 transition-transform duration-300">
-    <svg
-      className="w-8 h-8 md:w-9 md:h-9"
-      fill="none"
-      stroke="currentColor"
-      viewBox="0 0 24 24"
-    >
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth="2.2"
-        d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-      />
-    </svg>
+  <div className="inline-flex items-center justify-center w-14 h-14 md:w-16 md:h-16  rounded-2xl shadow-xl shadow-indigo-500/20 mb-4 md:mb-5 text-white transform hover:rotate-3 transition-transform duration-300">
+    <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-fuchsia-600 rounded-xl flex items-center justify-center shadow-lg shadow-purple-900/40">
+      <ShieldAlert className="text-white" size={24} />
+    </div>
   </div>
 );
 
@@ -99,10 +97,9 @@ const LoginApp = ({ isDarkMode: propDarkMode }) => {
     setPassword("");
     setConfirmPassword("");
   };
-
   const handleLogin = (e) => {
     e.preventDefault();
-    navigate("/home");
+    navigate("/home", { state: { email: email, password: password } });
     // const doLogin = async () => {
     //   if (!email || !password) {
     //     setError("Please enter email and password.");
@@ -344,6 +341,7 @@ const LoginApp = ({ isDarkMode: propDarkMode }) => {
                   <button
                     type="submit"
                     disabled={isLoading}
+                    onClick={navigate("/login")}
                     className="w-full px-6 py-4 rounded-2xl bg-indigo-600 text-white font-bold uppercase tracking-wider hover:bg-indigo-500 disabled:opacity-60 transition-colors cursor-pointer"
                   >
                     {isLoading ? "Creating..." : "Create Identity"}

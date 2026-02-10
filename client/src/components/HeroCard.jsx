@@ -1,6 +1,37 @@
+import { Flag } from "lucide-react";
 import React from "react";
-
+import { useState } from "react";
 const HeroCard = ({ onAction }) => {
+  const [status, setStatus] = useState("off");
+  const [generatecode, setGeneratecode] = useState("");
+  const onTurn = () => {
+    setStatus("on");
+  };
+  const randomCode = () => {
+    let code =
+      Math.floor(1000 + Math.random() * 9000) +
+      " " +
+      Math.floor(1000 + Math.random() * 9000) +
+      " " +
+      Math.floor(1000 + Math.random() * 9000);
+    return code;
+  };
+  const onGenerateCode = () => {
+    //based on data base
+    let random = randomCode();
+    //query database for code, if code exists, generate new code, else set code to generated code
+    // while (true) {}
+    setGeneratecode(random);
+    setStatus("generated");
+  };
+  const connectUser = () => {
+    //query database for code, if code exists, connect user, else show error
+    setStatus("connected");
+  };
+  const stopSharing = () => {
+    //stop sharing, update database
+    setStatus("off");
+  };
   return (
     <div className="relative group overflow-hidden bg-zinc-950/40 border border-zinc-800/50 rounded-[40px] p-1 shadow-2xl">
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full bg-purple-600/5 blur-[120px] pointer-events-none" />
@@ -17,19 +48,50 @@ const HeroCard = ({ onAction }) => {
           <div className="absolute bottom-[28%] left-1/2 -translate-x-1/2 w-12 h-6 border-b-4 border-zinc-800 rounded-b-lg" />
           <div className="absolute bottom-[22%] left-1/2 -translate-x-1/2 w-20 h-1 bg-zinc-800 rounded-full" />
         </div>
+        {status === "off" && (
+          <div className="flex-1 text-center lg:text-left">
+            <h2 className="text-4xl md:text-5xl font-extrabold text-white tracking-tight mb-6 leading-tight">
+              Ready to Start?
+            </h2>
+            <p className="text-lg text-zinc-400 font-medium leading-relaxed max-w-md mx-auto lg:mx-0 mb-10">
+              Turn on remote access to use this computer from anywhere else. It
+              only takes a minute to set up.
+            </p>
 
-        <div className="flex-1 text-center lg:text-left">
-          <h2 className="text-4xl md:text-5xl font-extrabold text-white tracking-tight mb-6 leading-tight">
-            Ready to Start?
-          </h2>
-          <p className="text-lg text-zinc-400 font-medium leading-relaxed max-w-md mx-auto lg:mx-0 mb-10">
-            Turn on remote access to use this computer from anywhere else. It
-            only takes a minute to set up.
-          </p>
-
-          <button
-            onClick={onAction}
-            className="
+            <button
+              onClick={onTurn}
+              className="
+    mx-25 my-15 
+    ml-[40px]
+    px-25 py-8 w-50 h-14
+    rounded-3xl 
+    cursor-pointer
+    text-sm font-black uppercase tracking-[0.2em] 
+    text-white
+    bg-gradient-to-r from-[#7c3aed] to-[#c026d3]
+    hover:from-[#8b5cf6] hover:to-[#d946ef]
+    shadow-lg shadow-[rgba(124,58,237,0.3)]
+    transition-all duration-300
+    active:scale-95
+  "
+            >
+              Turn On Now
+            </button>
+          </div>
+        )}
+        {/* generate code */}
+        {status === "on" && (
+          <div className="flex-1 text-center lg:text-left">
+            <h2 className="text-4xl md:text-5xl font-extrabold text-white tracking-tight mb-6 leading-tight">
+              Share this Screen
+            </h2>
+            <p className="text-lg text-zinc-400 font-medium leading-relaxed max-w-md mx-auto lg:mx-0 mb-10">
+              Generate a unique code to share with someone else. They can enter
+              this code on their end to connect to your computer securely.
+            </p>
+            <button
+              onClick={onGenerateCode}
+              className="
     mx-19 my-15 
     px-19 py-7 w-50 h-14
     rounded-3xl 
@@ -42,10 +104,50 @@ const HeroCard = ({ onAction }) => {
     transition-all duration-300
     active:scale-95
   "
-          >
-            Turn On Now
-          </button>
-        </div>
+            >
+              + Generate Code
+            </button>
+          </div>
+        )}
+        {status === "generated" && (
+          <div className="flex-1 text-center lg:text-left">
+            <h2 className="text-4xl md:text-5xl font-extrabold text-white tracking-tight mb-6 leading-tight">
+              Share this Screen
+              <p className="text-lg text-zinc-400 font-medium leading-relaxed max-w-md mx-auto lg:mx-0 mb-10">
+                Share the following code with the person you want to connect
+                with. They will have 5 minutes to enter the code and connect to
+                your computer.
+              </p>
+              <div className="mb-6 grid place-items-center">
+                <div className="text-3xl font-bold tracking-widest text-white mb-2">
+                  {generatecode}
+                </div>
+
+                <p className="text-sm text-zinc-400">
+                  This access code will expire in 5:00
+                </p>
+              </div>
+            </h2>
+            <button
+              onClick={stopSharing}
+              className="
+    mx-19 my-15 
+    px-19 py-7 w-50 h-14
+    rounded-3xl 
+    cursor-pointer
+    text-sm font-black uppercase tracking-[0.2em] 
+    text-white
+    bg-gradient-to-r from-[rgba(232, 14, 54, 0.3)] to-[#c026d3]
+    hover:from-[#8b5cf6] hover:to-[#d946ef]
+    shadow-lg shadow-[rgba(232, 14, 54, 0.3)]
+    transition-all duration-300
+    active:scale-95
+  "
+            >
+              cancel
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

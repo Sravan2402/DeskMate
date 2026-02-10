@@ -1,9 +1,7 @@
 import React from "react";
-
+import HelpDashboard from "./HelpDashBoard";
 const HelpView = () => {
-  return (
-    <div className="flex flex-col items-center justify-center h-full text-center gap-6"></div>
-  );
+  return <HelpDashboard />;
 };
 
 export default HelpView;

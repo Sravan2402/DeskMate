@@ -7,13 +7,20 @@ import {
   LogOut,
   ShieldAlert,
 } from "lucide-react";
-
+import { useNavigate } from "react-router-dom";
 const Sidebar = ({ activeTab, onTabChange }) => {
   const menuItems = [
     { icon: <Monitor size={20} />, label: "My Computers" },
     { icon: <Users size={20} />, label: "Help Someone" },
   ];
-
+  const navigate = useNavigate();
+  const handleLogOut = () => {
+    // Implement log out functionality here
+    navigate("/login");
+    console.debug(
+      "Orbital Link: Log out signal received, terminating session.",
+    );
+  };
   return (
     <aside className="w-64 bg-[#09090b]/80 backdrop-blur-xl border-r border-zinc-800/50 flex flex-col h-screen z-40 px-4 py-6">
       <div className="p-8 flex items-center gap-3">
@@ -65,13 +72,16 @@ const Sidebar = ({ activeTab, onTabChange }) => {
       </div>
 
       <div className="px-4 pb-8 space-y-2">
-        <button className="w-full flex items-center gap-4 px-4 py-3 text-zinc-500 hover:text-zinc-300 transition-colors group w-20 h-12">
+        <button className="w-full flex cursor-pointer items-center gap-4 px-4 py-3 text-zinc-500 hover:text-zinc-300 transition-colors group w-20 h-12">
           <Settings size={18} />
           <span className="text-[11px] uppercase tracking-widest font-semibold">
             Settings
           </span>
         </button>
-        <button className="w-full flex items-center gap-4 px-4 py-3 text-red-500/70 hover:text-red-400 transition-colors group w-20 h-12">
+        <button
+          onClick={handleLogOut}
+          className="w-full cursor-pointer flex items-center gap-4 px-4 py-3 text-red-500/70 hover:text-red-400 transition-colors group w-20 h-12"
+        >
           <LogOut size={18} />
           <span className="text-[11px] uppercase tracking-widest font-semibold">
             Log Out

@@ -8,7 +8,7 @@ import ChatAssistant from "../components/ChatAssistant";
 const Home = () => {
   const [activeTab, setActiveTab] = useState("My Computers");
   const [isAIAssistantOpen, setIsAIAssistantOpen] = useState(false);
-
+  const { email, password } = window.location.state || {};
   const handleNoOp = () => {
     console.debug("Orbital Link: Signal received, standby mode.");
   };
@@ -18,7 +18,7 @@ const Home = () => {
       <Sidebar activeTab={activeTab} onTabChange={setActiveTab} />
 
       <main className="flex-1 flex flex-col h-screen overflow-y-auto relative">
-        <Header activeTab={activeTab} />
+        <Header activeTab={activeTab} email={email} password={password} />
 
         <div className="flex-1 px-8 py-12 md:px-12 lg:px-20 relative z-10 max-w-7xl mx-auto w-full">
           {activeTab === "Help Someone" ? (

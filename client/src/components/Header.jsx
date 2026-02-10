@@ -1,7 +1,6 @@
 import React from "react";
 import { Sun, Moon, ChevronDown, Bell } from "lucide-react";
-
-const Header = ({ activeTab }) => {
+const Header = ({ activeTab, email, password }) => {
   return (
     <header className="h-20 px-8 md:px-12 flex items-center justify-between border-b border-zinc-900/50 backdrop-blur-md sticky top-0 z-30">
       <div className="flex items-center gap-2 text-[10px] uppercase tracking-[0.2em] font-bold text-zinc-500">
@@ -34,7 +33,7 @@ const Header = ({ activeTab }) => {
           <div className="flex flex-col">
             <div className="flex items-center gap-1">
               <span className="text-xs font-bold text-zinc-200 group-hover:text-white transition-colors">
-                Admin_Space
+                {email}
               </span>
               {/* profile dropbown */}
               <ChevronDown
