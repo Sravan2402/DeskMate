@@ -51,7 +51,7 @@ const InputField = ({
       value={value}
       onChange={(e) => onChange(e.target.value)}
       placeholder={placeholder}
-      className={`w-full px-5 py-3 min-h-[55px] rounded-2xl border transition-all text-lg font-medium focus:outline-none focus:ring-2 ${
+      className={`w-full px-4 py-3 min-h-[50px] rounded-2xl border transition-all text-base font-medium focus:outline-none focus:ring-2 ${
         type === "password" ? "tracking-[0.2em]" : ""
       } ${
         isDarkMode
@@ -152,15 +152,15 @@ const LoginApp = ({ isDarkMode: propDarkMode }) => {
 
   return (
     <div
-      className={`min-h-screen flex items-center justify-center px-4 sm:px-6 py-16 sm:py-32 relative ${isDark ? "bg-slate-900" : "bg-slate-50"}`}
+      className={`min-h-screen flex items-center justify-center px-4 sm:px-6 py-8 sm:py-12 relative ${isDark ? "bg-slate-900" : "bg-slate-50"}`}
     >
       {/* Theme toggle - top right */}
-      <div className="absolute top-4 right-4 md:top-6 md:right-6 w-20 h-12">
+      <div className="absolute top-4 right-4 md:top-6 md:right-6">
         <button
           type="button"
           aria-label="Toggle theme"
           onClick={() => setLocalDark((s) => !s)}
-          className={`flex items-center gap-2 px-3 py-2 rounded-3xl transition-all w-20 h-10 ${isDark ? "bg-slate-800 hover:bg-slate-700 text-slate-200" : "bg-slate-100 hover:bg-slate-200 text-slate-700"}`}
+          className={`flex items-center gap-2 px-3 py-2 rounded-3xl transition-all h-10 ${isDark ? "bg-slate-800 hover:bg-slate-700 text-slate-200" : "bg-slate-100 hover:bg-slate-200 text-slate-700"}`}
         >
           {isDark ? (
             <>
@@ -194,9 +194,10 @@ const LoginApp = ({ isDarkMode: propDarkMode }) => {
         </button>
       </div>
 
-      <div className="flex flex-col items-center w-full max-w-[440px] md:max-w-[460px]">
+      {/* Center column — full width on mobile, capped on desktop */}
+      <div className="flex flex-col items-center w-full max-w-sm sm:max-w-[440px] md:max-w-[460px]">
         {/* Brand Header */}
-        <div className="text-center mb-6 md:mb-12 mt-4 sm:mt-0 animate-in fade-in slide-in-from-top-4 duration-700">
+        <div className="text-center mb-6 md:mb-10 mt-4 sm:mt-0 animate-in fade-in slide-in-from-top-4 duration-700">
           <Logo />
           <h2
             className={`text-3xl md:text-4xl font-black mb-1 tracking-tight gap-3 ${isDark ? "text-white" : "text-slate-800"}`}
@@ -217,26 +218,26 @@ const LoginApp = ({ isDarkMode: propDarkMode }) => {
           }`}
         >
           {view === "login" ? (
-            <div className="w-full flex flex-col items-center gap-2 sm:gap-4 md:gap-6 animate-in fade-in slide-in-from-right-4 duration-500">
+            <div className="w-full flex flex-col items-center gap-4 animate-in fade-in slide-in-from-right-4 duration-500">
               <div
-                className={`px-5 py-1.5 rounded-full mb-5 mt-4 sm:mt-8 w-40 h-8 justify-center flex items-center ${isDark ? "bg-indigo-500/10" : "bg-indigo-50"}`}
+                className={`px-5 py-1.5 rounded-full w-40 h-8 justify-center flex items-center ${isDark ? "bg-indigo-500/10" : "bg-indigo-50"}`}
               >
                 <span className="text-[10px] font-bold text-indigo-500 uppercase tracking-widest">
                   Sign In to Continue
                 </span>
               </div>
               <h2
-                className={`text-2xl md:text-3xl font-black mb-2 ${isDark ? "text-white" : "text-slate-900"}`}
+                className={`text-2xl md:text-3xl font-black ${isDark ? "text-white" : "text-slate-900"}`}
               >
                 Welcome Back
               </h2>
-              <p className="text-xs md:text-sm font-medium text-slate-400 mb-2 text-center">
+              <p className="text-xs md:text-sm font-medium text-slate-400 text-center">
                 Securely access your workspace anywhere.
               </p>
 
               <form
                 onSubmit={handleLogin}
-                className="w-full space-y-6 sm:space-y-14"
+                className="w-full flex flex-col gap-5 mt-2"
               >
                 {error && (
                   <div className="text-[10px] font-bold text-rose-500 uppercase tracking-widest text-center bg-rose-500/10 p-4 rounded-xl border border-rose-500/20">
@@ -263,19 +264,17 @@ const LoginApp = ({ isDarkMode: propDarkMode }) => {
                   showForgot
                 />
 
-                <div className="flex justify-center">
-                  <button
-                    type="submit"
-                    disabled={isLoading}
-                    className="w-full sm:w-45 h-10 rounded-2xl bg-indigo-600 text-white font-bold uppercase tracking-wider hover:bg-indigo-500 disabled:opacity-60 transition-colors cursor-pointer"
-                  >
-                    {isLoading ? "Signing in..." : "Sign In"}
-                  </button>
-                </div>
+                <button
+                  type="submit"
+                  disabled={isLoading}
+                  className="w-full mt-2 h-12 rounded-2xl bg-indigo-600 text-white font-bold uppercase tracking-wider hover:bg-indigo-500 disabled:opacity-60 transition-colors cursor-pointer"
+                >
+                  {isLoading ? "Signing in..." : "Sign In"}
+                </button>
               </form>
 
               <div
-                className={`mt-6 sm:mt-10 md:mt-14 pt-8 border-t w-full text-center ${isDark ? "border-slate-800" : "border-slate-50"}`}
+                className={`mt-6 pt-6 border-t w-full text-center ${isDark ? "border-slate-800" : "border-slate-50"}`}
               >
                 <p className="text-[11px] font-semibold text-slate-400">
                   New to Deskmate?
@@ -292,26 +291,26 @@ const LoginApp = ({ isDarkMode: propDarkMode }) => {
               </div>
             </div>
           ) : (
-            <div className="w-full flex flex-col items-center gap-2 sm:gap-4 md:gap-6 animate-in fade-in slide-in-from-left-4 duration-500">
+            <div className="w-full flex flex-col items-center gap-4 animate-in fade-in slide-in-from-left-4 duration-500">
               <div
-                className={`px-5 py-1.5 rounded-full mb-8 ${isDark ? "bg-indigo-500/10" : "bg-indigo-50"}`}
+                className={`px-5 py-1.5 rounded-full ${isDark ? "bg-indigo-500/10" : "bg-indigo-50"}`}
               >
                 <span className="text-[10px] font-bold text-indigo-500 uppercase tracking-widest">
                   Register New Identity
                 </span>
               </div>
               <h2
-                className={`text-2xl md:text-3xl font-black mb-2 ${isDark ? "text-white" : "text-slate-900"}`}
+                className={`text-2xl md:text-3xl font-black ${isDark ? "text-white" : "text-slate-900"}`}
               >
                 Sign Up
               </h2>
-              <p className="text-xs md:text-sm font-medium text-slate-400 mb-6 sm:mb-10 text-center">
+              <p className="text-xs md:text-sm font-medium text-slate-400 text-center">
                 Start your secure journey with Deskmate.
               </p>
 
               <form
                 onSubmit={handleRegister}
-                className="w-full space-y-4 sm:space-y-6"
+                className="w-full flex flex-col gap-5 mt-2"
               >
                 {error && (
                   <div className="text-[10px] font-bold text-rose-500 uppercase tracking-widest text-center bg-rose-500/10 p-4 rounded-xl border border-rose-500/20">
@@ -342,19 +341,17 @@ const LoginApp = ({ isDarkMode: propDarkMode }) => {
                   placeholder="••••••••"
                   isDarkMode={isDark}
                 />
-                <div className="pt-2">
-                  <button
-                    type="submit"
-                    disabled={isLoading}
-                    className="w-full px-6 py-4 rounded-2xl bg-indigo-600 text-white font-bold uppercase tracking-wider hover:bg-indigo-500 disabled:opacity-60 transition-colors cursor-pointer"
-                  >
-                    {isLoading ? "Creating..." : "Create Identity"}
-                  </button>
-                </div>
+                <button
+                  type="submit"
+                  disabled={isLoading}
+                  className="w-full mt-2 h-12 rounded-2xl bg-indigo-600 text-white font-bold uppercase tracking-wider hover:bg-indigo-500 disabled:opacity-60 transition-colors cursor-pointer"
+                >
+                  {isLoading ? "Creating..." : "Create Identity"}
+                </button>
               </form>
 
               <div
-                className={`mt-6 sm:mt-10 md:mt-14 pt-8 border-t w-full text-center ${isDark ? "border-slate-800" : "border-slate-50"}`}
+                className={`mt-6 pt-6 border-t w-full text-center ${isDark ? "border-slate-800" : "border-slate-50"}`}
               >
                 <p className="text-[11px] font-semibold text-slate-400">
                   Already have an identity?
