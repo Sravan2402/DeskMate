@@ -5,7 +5,6 @@ import { Routes, Route, Navigate } from "react-router-dom";
 const App = () => {
   return (
     <Routes>
-      {/* Default route */}
       <Route path="/" element={<Navigate to="/login" />} />
 
       <Route path="/login" element={<Login />} />

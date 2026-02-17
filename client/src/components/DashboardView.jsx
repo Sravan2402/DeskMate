@@ -4,10 +4,10 @@ import HeroCard from "./HeroCard";
 
 const DashboardView = ({ onAction }) => {
   return (
-    <div className="space-y-12 animate-in fade-in slide-in-from-bottom-4 duration-1000">
+    <div className="space-y-8 sm:space-y-12 animate-in fade-in slide-in-from-bottom-4 duration-1000">
       <HeroCard onAction={onAction} />
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
         {[
           {
             icon: <Shield size={20} className="text-purple-500" />,
@@ -36,18 +36,22 @@ const DashboardView = ({ onAction }) => {
         ].map((stat, i) => (
           <div
             key={i}
-            className="bg-[#09090b]/40 border border-zinc-800/50 p-6 rounded-[32px] hover:border-zinc-700 transition-colors group"
+            className="bg-[#09090b]/40 border border-zinc-800/50 p-4 sm:p-6 rounded-[24px] sm:rounded-[32px] hover:border-zinc-700 transition-colors group"
           >
-            <div className="flex items-center gap-3 mb-4">
-              <div className="p-2.5 bg-zinc-900 rounded-2xl group-hover:scale-110 transition-transform">
+            <div className="flex items-center gap-2 sm:gap-3 mb-3 sm:mb-4">
+              <div className="p-2 sm:p-2.5 bg-zinc-900 rounded-xl sm:rounded-2xl group-hover:scale-110 transition-transform">
                 {stat.icon}
               </div>
-              <span className="text-[10px] uppercase tracking-[0.2em] font-black text-zinc-500">
+              <span className="text-[9px] sm:text-[10px] uppercase tracking-[0.15em] sm:tracking-[0.2em] font-black text-zinc-500">
                 {stat.label}
               </span>
             </div>
-            <div className="text-xl font-bold text-white mb-1">{stat.val}</div>
-            <div className="text-xs text-zinc-500 font-medium">{stat.desc}</div>
+            <div className="text-base sm:text-xl font-bold text-white mb-1 truncate">
+              {stat.val}
+            </div>
+            <div className="text-[10px] sm:text-xs text-zinc-500 font-medium leading-snug">
+              {stat.desc}
+            </div>
           </div>
         ))}
       </div>

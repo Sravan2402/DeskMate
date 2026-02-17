@@ -8,8 +8,9 @@ import {
   LogOut,
   ShieldAlert,
 } from "lucide-react";
+
 const Logo = () => (
-  <div className="inline-flex items-center justify-center w-14 h-14 md:w-16 md:h-16  rounded-2xl shadow-xl shadow-indigo-500/20 mb-4 md:mb-5 text-white transform hover:rotate-3 transition-transform duration-300">
+  <div className="inline-flex items-center justify-center w-14 h-14 md:w-16 md:h-16 rounded-2xl shadow-xl shadow-indigo-500/20 mb-4 md:mb-5 text-white transform hover:rotate-3 transition-transform duration-300">
     <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-fuchsia-600 rounded-xl flex items-center justify-center shadow-lg shadow-purple-900/40">
       <ShieldAlert className="text-white" size={24} />
     </div>
@@ -25,7 +26,7 @@ const InputField = ({
   isDarkMode,
   showForgot,
 }) => (
-  <div className="w-full space-y-8">
+  <div className="w-full space-y-2">
     <div className="flex justify-between items-center">
       <label
         className={`block text-[11px] font-bold uppercase tracking-widest ${
@@ -151,7 +152,7 @@ const LoginApp = ({ isDarkMode: propDarkMode }) => {
 
   return (
     <div
-      className={`min-h-screen flex items-center justify-center px-4 sm:px-6 py-32 relative ${isDark ? "bg-slate-900" : "bg-slate-50"}`}
+      className={`min-h-screen flex items-center justify-center px-4 sm:px-6 py-16 sm:py-32 relative ${isDark ? "bg-slate-900" : "bg-slate-50"}`}
     >
       {/* Theme toggle - top right */}
       <div className="absolute top-4 right-4 md:top-6 md:right-6 w-20 h-12">
@@ -159,7 +160,7 @@ const LoginApp = ({ isDarkMode: propDarkMode }) => {
           type="button"
           aria-label="Toggle theme"
           onClick={() => setLocalDark((s) => !s)}
-          className={`flex items-center gap-2 px-3 py-2 rounded-3xl transition-all w-20 h-10 gap-2  ${isDark ? "bg-slate-800 hover:bg-slate-700 text-slate-200" : "bg-slate-100 hover:bg-slate-200 text-slate-700"}`}
+          className={`flex items-center gap-2 px-3 py-2 rounded-3xl transition-all w-20 h-10 ${isDark ? "bg-slate-800 hover:bg-slate-700 text-slate-200" : "bg-slate-100 hover:bg-slate-200 text-slate-700"}`}
         >
           {isDark ? (
             <>
@@ -192,9 +193,10 @@ const LoginApp = ({ isDarkMode: propDarkMode }) => {
           )}
         </button>
       </div>
-      <div className="flex flex-col items-center w-full max-w-5xl">
+
+      <div className="flex flex-col items-center w-full max-w-[440px] md:max-w-[460px]">
         {/* Brand Header */}
-        <div className="text-center mb-8 md:mb-12 mt-4 sm:mt-0 animate-in fade-in slide-in-from-top-4 duration-700">
+        <div className="text-center mb-6 md:mb-12 mt-4 sm:mt-0 animate-in fade-in slide-in-from-top-4 duration-700">
           <Logo />
           <h2
             className={`text-3xl md:text-4xl font-black mb-1 tracking-tight gap-3 ${isDark ? "text-white" : "text-slate-800"}`}
@@ -210,21 +212,21 @@ const LoginApp = ({ isDarkMode: propDarkMode }) => {
 
         {/* Card Content */}
         <div
-          className={`relative w-full max-w-[440px] md:max-w-[460px] rounded-3xl shadow-lg p-6 sm:p-10 md:p-14 flex flex-col items-center overflow-hidden transition-colors duration-300 ${
+          className={`relative w-full rounded-3xl shadow-lg p-6 sm:p-10 md:p-14 flex flex-col items-center overflow-hidden transition-colors duration-300 ${
             isDark ? "bg-slate-900 border border-slate-800" : "bg-white"
           }`}
         >
           {view === "login" ? (
             <div className="w-full flex flex-col items-center gap-2 sm:gap-4 md:gap-6 animate-in fade-in slide-in-from-right-4 duration-500">
               <div
-                className={`px-5 py-1.5 rounded-full mb-5 mt-8 w-40 h-8 justify-center flex items-center ${isDark ? "bg-indigo-500/10" : "bg-indigo-50"}`}
+                className={`px-5 py-1.5 rounded-full mb-5 mt-4 sm:mt-8 w-40 h-8 justify-center flex items-center ${isDark ? "bg-indigo-500/10" : "bg-indigo-50"}`}
               >
                 <span className="text-[10px] font-bold text-indigo-500 uppercase tracking-widest">
                   Sign In to Continue
                 </span>
               </div>
               <h2
-                className={`text-2xl md:text-3xl font-black mb-2   ${isDark ? "text-white" : "text-slate-900"}`}
+                className={`text-2xl md:text-3xl font-black mb-2 ${isDark ? "text-white" : "text-slate-900"}`}
               >
                 Welcome Back
               </h2>
@@ -234,7 +236,7 @@ const LoginApp = ({ isDarkMode: propDarkMode }) => {
 
               <form
                 onSubmit={handleLogin}
-                className="w-full space-y-14 ml-3 mr-3"
+                className="w-full space-y-6 sm:space-y-14"
               >
                 {error && (
                   <div className="text-[10px] font-bold text-rose-500 uppercase tracking-widest text-center bg-rose-500/10 p-4 rounded-xl border border-rose-500/20">
@@ -265,7 +267,7 @@ const LoginApp = ({ isDarkMode: propDarkMode }) => {
                   <button
                     type="submit"
                     disabled={isLoading}
-                    className="w-45 h-10 rounded-2xl bg-indigo-600 text-white font-bold uppercase tracking-wider hover:bg-indigo-500 disabled:opacity-60 transition-colors cursor-pointer"
+                    className="w-full sm:w-45 h-10 rounded-2xl bg-indigo-600 text-white font-bold uppercase tracking-wider hover:bg-indigo-500 disabled:opacity-60 transition-colors cursor-pointer"
                   >
                     {isLoading ? "Signing in..." : "Sign In"}
                   </button>
@@ -273,7 +275,7 @@ const LoginApp = ({ isDarkMode: propDarkMode }) => {
               </form>
 
               <div
-                className={`mt-10 md:mt-14 pt-8 border-t w-full text-center ${isDark ? "border-slate-800" : "border-slate-50"}`}
+                className={`mt-6 sm:mt-10 md:mt-14 pt-8 border-t w-full text-center ${isDark ? "border-slate-800" : "border-slate-50"}`}
               >
                 <p className="text-[11px] font-semibold text-slate-400">
                   New to Deskmate?
@@ -303,11 +305,14 @@ const LoginApp = ({ isDarkMode: propDarkMode }) => {
               >
                 Sign Up
               </h2>
-              <p className="text-xs md:text-sm font-medium text-slate-400 mb-10 text-center">
+              <p className="text-xs md:text-sm font-medium text-slate-400 mb-6 sm:mb-10 text-center">
                 Start your secure journey with Deskmate.
               </p>
 
-              <form onSubmit={handleRegister} className="w-full space-y-6">
+              <form
+                onSubmit={handleRegister}
+                className="w-full space-y-4 sm:space-y-6"
+              >
                 {error && (
                   <div className="text-[10px] font-bold text-rose-500 uppercase tracking-widest text-center bg-rose-500/10 p-4 rounded-xl border border-rose-500/20">
                     {error}
@@ -341,7 +346,6 @@ const LoginApp = ({ isDarkMode: propDarkMode }) => {
                   <button
                     type="submit"
                     disabled={isLoading}
-                    onClick={navigate("/login")}
                     className="w-full px-6 py-4 rounded-2xl bg-indigo-600 text-white font-bold uppercase tracking-wider hover:bg-indigo-500 disabled:opacity-60 transition-colors cursor-pointer"
                   >
                     {isLoading ? "Creating..." : "Create Identity"}
@@ -350,7 +354,7 @@ const LoginApp = ({ isDarkMode: propDarkMode }) => {
               </form>
 
               <div
-                className={`mt-10 md:mt-14 pt-8 border-t w-full text-center ${isDark ? "border-slate-800" : "border-slate-50"}`}
+                className={`mt-6 sm:mt-10 md:mt-14 pt-8 border-t w-full text-center ${isDark ? "border-slate-800" : "border-slate-50"}`}
               >
                 <p className="text-[11px] font-semibold text-slate-400">
                   Already have an identity?

@@ -17,10 +17,11 @@ const Home = () => {
     <div className="flex min-h-screen bg-[#050505] text-white overflow-hidden w-full">
       <Sidebar activeTab={activeTab} onTabChange={setActiveTab} />
 
-      <main className="flex-1 flex flex-col h-screen overflow-y-auto relative">
+      {/* pt-16 on mobile to clear the fixed mobile top bar from Sidebar */}
+      <main className="flex-1 flex flex-col h-screen overflow-y-auto relative pt-16 md:pt-0">
         <Header activeTab={activeTab} email={email} password={password} />
 
-        <div className="flex-1 px-8 py-12 md:px-12 lg:px-20 relative z-10 max-w-7xl mx-auto w-full">
+        <div className="flex-1 px-4 py-8 sm:px-8 sm:py-12 md:px-12 lg:px-20 relative z-10 max-w-7xl mx-auto w-full">
           {activeTab === "Help Someone" ? (
             <HelpView />
           ) : (
@@ -32,8 +33,8 @@ const Home = () => {
           </div>
         </div>
 
-        <footer className="px-8 py-8 md:px-12 lg:px-20 flex flex-col md:flex-row justify-between items-center text-[9px] uppercase tracking-[0.3em] text-zinc-600 gap-4 border-t border-zinc-900/50">
-          <div className="flex gap-8">
+        <footer className="px-4 py-6 sm:px-8 sm:py-8 md:px-12 lg:px-20 flex flex-col md:flex-row justify-between items-center text-[9px] uppercase tracking-[0.3em] text-zinc-600 gap-4 border-t border-zinc-900/50">
+          <div className="flex flex-wrap justify-center md:justify-start gap-4 md:gap-8">
             <a
               href="#"
               className="hover:text-white transition-colors font-bold"
@@ -59,22 +60,22 @@ const Home = () => {
         </footer>
       </main>
 
-      <div className="fixed bottom-8 right-8 z-50">
+      <div className="fixed bottom-4 right-4 sm:bottom-8 sm:right-8 z-50">
         <button
           onClick={() => setIsAIAssistantOpen(!isAIAssistantOpen)}
-          className="w-16 h-16 rounded-2xl bg-gradient-to-br from-purple-600 to-indigo-600 flex items-center justify-center orbital-glow hover:scale-110 hover:-rotate-3 transition-all duration-300 shadow-2xl shadow-purple-900/50 group"
+          className="w-12 h-12 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-br from-purple-600 to-indigo-600 flex items-center justify-center orbital-glow hover:scale-110 hover:-rotate-3 transition-all duration-300 shadow-2xl shadow-purple-900/50 group"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
-            width="28"
-            height="28"
+            width="24"
+            height="24"
             viewBox="0 0 24 24"
             fill="none"
             stroke="currentColor"
             strokeWidth="2"
             strokeLinecap="round"
             strokeLinejoin="round"
-            className="text-white group-hover:scale-110 transition-transform"
+            className="text-white group-hover:scale-110 transition-transform sm:w-7 sm:h-7"
           >
             <path d="M12 8V4H8" />
             <rect width="16" height="12" x="4" y="8" rx="2" />
