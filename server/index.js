@@ -1,22 +1,26 @@
-const express = require("express");
-const dotenv = require("dotenv");
-const cors = require("cors");
-const connectDB = require("./mongoDB/connect.js");
-dotenv.config();
-const app = express();
-app.use(cors());
-app.get("/", async (req, res) => {
-  res.send("hello world");
+require("dotenv").config();
+const app = require("./app");
+const prisma = require("./config/prisma");
+const { redis } = require("./config/redis");
+
+const PORT = process.env.PORT || 8080;
+
+const server = app.listen(PORT, () => {
+  console.log(`\n🚀 Deskmate backend running on port ${PORT}`);
+  console.log(`   Health: http://localhost:${PORT}/health\n`);
 });
-app.use("/api/v1/auth", require("./routes/auth.js"));
-const startServer = async () => {
-  try {
-    await connectDB(process.env.MONGODB_URL);
-    app.listen(8080, () => {
-      console.log("server is started on http://localhost:8080");
-    });
-  } catch (err) {
-    console.log(err);
-  }
+
+// graceful shutdown
+const shutdown = async (signal) => {
+  console.log(`${signal} received. Shutting down...`);
+  server.close(async () => {
+    await prisma.$disconnect();
+    await redis.quit();
+    process.exit(0);
+  });
 };
-startServer();
+process.on("SIGTERM", () => shutdown("SIGTERM"));
+process.on("SIGINT", () => shutdown("SIGINT"));
+process.on("unhandledRejection", (reason) => {
+  console.error("Unhandled Rejection:", reason);
+});
