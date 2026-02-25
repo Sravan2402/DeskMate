@@ -1,7 +1,7 @@
 import React from "react";
 import { Sun, Moon, ChevronDown, Bell } from "lucide-react";
 
-const Header = ({ activeTab, email, password }) => {
+const Header = ({ activeTab, email }) => {
   return (
     <header className="h-14 md:h-20 px-4 sm:px-8 md:px-12 flex items-center justify-between border-b border-zinc-900/50 backdrop-blur-md sticky top-0 z-30">
       {/* Breadcrumb — hidden on small screens */}

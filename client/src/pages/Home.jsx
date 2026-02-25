@@ -5,10 +5,9 @@ import DashboardView from "../components/DashboardView";
 import HelpView from "../components/HelpView";
 import ChatAssistant from "../components/ChatAssistant";
 
-const Home = () => {
+const Home = ({ email }) => {
   const [activeTab, setActiveTab] = useState("My Computers");
   const [isAIAssistantOpen, setIsAIAssistantOpen] = useState(false);
-  const { email, password } = window.location.state || {};
   const handleNoOp = () => {
     console.debug("Orbital Link: Signal received, standby mode.");
   };
@@ -19,7 +18,7 @@ const Home = () => {
 
       {/* pt-16 on mobile to clear the fixed mobile top bar from Sidebar */}
       <main className="flex-1 flex flex-col h-screen overflow-y-auto relative pt-16 md:pt-0">
-        <Header activeTab={activeTab} email={email} password={password} />
+        <Header activeTab={activeTab} email={email} />
 
         <div className="flex-1 px-4 py-8 sm:px-8 sm:py-12 md:px-12 lg:px-20 relative z-10 max-w-7xl mx-auto w-full">
           {activeTab === "Help Someone" ? (

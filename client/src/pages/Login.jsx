@@ -1,13 +1,6 @@
-import React, { useState, useEffect, use } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import {
-  Monitor,
-  Users,
-  Settings,
-  HelpCircle,
-  LogOut,
-  ShieldAlert,
-} from "lucide-react";
+import { ShieldAlert } from "lucide-react";
 
 const Logo = () => (
   <div className="inline-flex items-center justify-center w-14 h-14 md:w-16 md:h-16 rounded-2xl shadow-xl shadow-indigo-500/20 mb-4 md:mb-5 text-white transform hover:rotate-3 transition-transform duration-300">
@@ -66,27 +59,31 @@ const InputField = ({
 const LoginApp = ({ isDarkMode: propDarkMode }) => {
   const navigate = useNavigate();
   const [view, setView] = useState("login");
+
   const prefersDark =
     typeof window !== "undefined" &&
     window.matchMedia &&
     window.matchMedia("(prefers-color-scheme: dark)").matches;
+
   const stored =
     typeof window !== "undefined" ? localStorage.getItem("theme") : null;
+
   const [localDark, setLocalDark] = useState(
     stored ? stored === "dark" : prefersDark,
   );
+
   const isDark = typeof propDarkMode === "boolean" ? propDarkMode : localDark;
+
   useEffect(() => {
-    // keep document root in sync for Tailwind's dark mode if used
     if (typeof document !== "undefined") {
       if (isDark) document.documentElement.classList.add("dark");
       else document.documentElement.classList.remove("dark");
     }
-    // persist only when parent doesn't force mode
     if (typeof propDarkMode !== "boolean") {
       localStorage.setItem("theme", localDark ? "dark" : "light");
     }
   }, [localDark, propDarkMode, isDark]);
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -98,56 +95,76 @@ const LoginApp = ({ isDarkMode: propDarkMode }) => {
     setPassword("");
     setConfirmPassword("");
   };
-  const handleLogin = (e) => {
+
+  const handleLogin = async (e) => {
     e.preventDefault();
-    navigate("/home", { state: { email: email, password: password } });
-    // const doLogin = async () => {
-    //   if (!email || !password) {
-    //     setError("Please enter email and password.");
-    //     return;
-    //   }
-    //   setIsLoading(true);
-    //   setError("");
-    //   try {
-    //     const res = await fetch("http://localhost:8080/api/auth/login", {
-    //       method: "POST",
-    //       headers: { "Content-Type": "application/json" },
-    //       body: JSON.stringify({ email, password }),
-    //     });
-    //     if (!res.ok) {
-    //       const data = await res.json().catch(() => ({}));
-    //       setError(data?.message || `Login failed (${res.status})`);
-    //     } else {
-    //       const data = await res.json().catch(() => ({}));
-    //       // store token if provided
-    //       if (data.token) localStorage.setItem("token", data.token);
-    //       // simple success handling
-    //       setError("");
-    //       alert("Signed in successfully.");
-    //     }
-    //   } catch (err) {
-    //     setError("Network error: could not reach server.");
-    //   } finally {
-    //     setIsLoading(false);
-    //   }
-    // };
-    // doLogin();
+
+    if (!email || !password) {
+      setError("Please enter email and password.");
+      return;
+    }
+
+    setIsLoading(true);
+    setError("");
+
+    try {
+      const res = await fetch("http://localhost:8080/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        setError(data.message || "Login failed.");
+      } else {
+        localStorage.setItem("accessToken", data.accessToken);
+        localStorage.setItem("refreshToken", data.refreshToken);
+        navigate("/home", { state: { email: data.user.email } });
+      }
+    } catch (err) {
+      setError("Network error: could not reach server.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const handleRegister = (e) => {
+  const handleRegister = async (e) => {
     e.preventDefault();
+
     if (password !== confirmPassword) {
       setError("Passwords do not match!");
       return;
     }
+    if (password.length < 8) {
+      setError("Password must be at least 8 characters.");
+      return;
+    }
+
     setIsLoading(true);
     setError("");
-    setTimeout(() => {
+
+    try {
+      const res = await fetch("http://localhost:8080/api/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        setError(data.message || "Registration failed.");
+      } else {
+        setView("login");
+        resetForm();
+      }
+    } catch (err) {
+      setError("Network error: could not reach server.");
+    } finally {
       setIsLoading(false);
-      alert("Identity verified! You can now sign in.");
-      setView("login");
-      resetForm();
-    }, 1500);
+    }
   };
 
   return (
@@ -186,15 +203,16 @@ const LoginApp = ({ isDarkMode: propDarkMode }) => {
               >
                 <path d="M17.293 13.293A8 8 0 116.707 2.707a7 7 0 0010.586 10.586z" />
               </svg>
+              {/* FIX: was <h1>Light</h1> inside a <span>, which is invalid HTML */}
               <span className="text-xs font-semibold uppercase tracking-wider">
-                <h1>Light</h1>
+                Light
               </span>
             </>
           )}
         </button>
       </div>
 
-      {/* Center column — full width on mobile, capped on desktop */}
+      {/* Center column */}
       <div className="flex flex-col items-center w-full max-w-sm sm:max-w-[440px] md:max-w-[460px]">
         {/* Brand Header */}
         <div className="text-center mb-6 md:mb-10 mt-4 sm:mt-0 animate-in fade-in slide-in-from-top-4 duration-700">
@@ -285,7 +303,7 @@ const LoginApp = ({ isDarkMode: propDarkMode }) => {
                     }}
                     className="ml-2.5 text-indigo-600 font-bold uppercase tracking-widest hover:text-indigo-500 transition-colors cursor-pointer"
                   >
-                    Create Identity
+                    Sign Up
                   </button>
                 </p>
               </div>
@@ -373,4 +391,5 @@ const LoginApp = ({ isDarkMode: propDarkMode }) => {
     </div>
   );
 };
+
 export default LoginApp;
