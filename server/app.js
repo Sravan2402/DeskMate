@@ -1,52 +1,44 @@
+require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
-const helmet = require("helmet");
-const morgan = require("morgan");
 const { errorHandler } = require("./middleware/errorHandler");
 const authRoutes = require("./routes/auth");
 const sessionRoutes = require("./routes/sessions");
 
 const app = express();
 
-// security
-app.use(helmet());
+// ── CORS ─────────────────────────────────────────────────────────────────────
+const allowedOrigins = process.env.ALLOWED_ORIGINS
+  ? process.env.ALLOWED_ORIGINS.split(",").map((o) => o.trim())
+  : ["http://localhost:5173"];
 
-// allow frontend to talk to backend
 app.use(
   cors({
-    origin: process.env.CLIENT_URL || "http://localhost:5173",
-    credentials: true,
+    origin: (origin, callback) => {
+      // Allow requests with no origin (mobile apps, curl, Postman)
+      if (!origin) return callback(null, true);
+      if (allowedOrigins.includes(origin)) return callback(null, true);
+      callback(new Error(`CORS blocked: ${origin}`));
+    },
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
+    credentials: true,
   }),
 );
 
-// parse JSON
-app.use(express.json({ limit: "10kb" }));
-app.use(express.urlencoded({ extended: true }));
+// Handle preflight for all routes
+app.options("/{*path}", cors());
 
-// log requests in terminal
-if (process.env.NODE_ENV === "development") {
-  app.use(morgan("dev"));
-}
+app.use(express.json());
 
-// health check
-app.get("/health", (req, res) => {
-  res.json({ status: "ok", service: "deskmate-backend" });
-});
+// Health check
+app.get("/health", (req, res) => res.json({ status: "ok" }));
 
-// routes
-app.use("/api/auth", authRoutes);
+// Routes
+app.use("/api/account", authRoutes);
 app.use("/api/sessions", sessionRoutes);
 
-// 404
-app.use((req, res) => {
-  res
-    .status(404)
-    .json({ message: `Route ${req.method} ${req.path} not found.` });
-});
-
-// error handler — must be last
+// Error handler (must be last)
 app.use(errorHandler);
 
 module.exports = app;

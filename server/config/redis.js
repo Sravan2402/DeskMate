@@ -7,6 +7,11 @@ const redis = new Redis(process.env.REDIS_URL, {
   },
   maxRetriesPerRequest: 3,
   enableReadyCheck: true,
+  keepAlive: 30000, // ← ping every 30s to keep connection alive
+  connectTimeout: 10000,
+  tls: {
+    rejectUnauthorized: false,
+  },
 });
 
 redis.on("connect", () => {

@@ -8,7 +8,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev":"nodemon server/index.js",
+    "dev": "nodemon server/index.js",
     "start": "node server/index.js"
   },
   "dependencies": {
@@ -23,6 +23,8 @@
     "jsonwebtoken": "^9.0.3",
     "morgan": "^1.10.1",
     "prisma": "^5.22.0",
+    "socket": "^1.1.66",
+    "socket.io": "^4.8.3",
     "uuid": "^13.0.0"
   },
   "devDependencies": {
