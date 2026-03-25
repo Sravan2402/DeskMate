@@ -1,4 +1,3 @@
-const { v4: uuidv4 } = require("uuid");
 const prisma = require("../config/prisma");
 const {
   setSession,
@@ -8,18 +7,21 @@ const {
   getSessionTTL,
 } = require("../config/redis");
 
-// Generate a random 6-digit access code
+// Generate a random 6-char alphanumeric code (A-Z, 0-9)
+// Excludes easily confused chars: 0/O, 1/I/L
+const CHARSET = "ABCDEFGHJKMNPQRSTUVWXYZ23456789";
 const generateCode = () =>
-  Math.floor(100000 + Math.random() * 900000).toString();
+  Array.from(
+    { length: 6 },
+    () => CHARSET[Math.floor(Math.random() * CHARSET.length)],
+  ).join("");
 
 // POST /api/sessions/create
-// Host creates a session and gets an access code
 const createSession = async (req, res, next) => {
   try {
     const hostUserId = req.user.id;
     const code = generateCode();
 
-    // Create a pending connection record in DB
     const connection = await prisma.connection.create({
       data: {
         hostUserId,
@@ -28,7 +30,6 @@ const createSession = async (req, res, next) => {
       },
     });
 
-    // Cache session state in Redis (TTL from env, default 5 min)
     await setSession(code, {
       connectionId: connection.id,
       hostUserId,
@@ -48,7 +49,6 @@ const createSession = async (req, res, next) => {
 };
 
 // POST /api/sessions/join
-// Guest joins a session using an access code
 const joinSession = async (req, res, next) => {
   try {
     const { code } = req.body;
@@ -77,7 +77,6 @@ const joinSession = async (req, res, next) => {
         .json({ message: "You cannot join your own session." });
     }
 
-    // Update Redis session state
     const updated = await updateSession(code, {
       ...session,
       guestUserId,
@@ -88,7 +87,6 @@ const joinSession = async (req, res, next) => {
       return res.status(410).json({ message: "Session has expired." });
     }
 
-    // Update DB record
     await prisma.connection.update({
       where: { id: session.connectionId },
       data: {
@@ -109,7 +107,6 @@ const joinSession = async (req, res, next) => {
 };
 
 // POST /api/sessions/end
-// Host ends the session
 const endSession = async (req, res, next) => {
   try {
     const { code } = req.body;
@@ -130,10 +127,8 @@ const endSession = async (req, res, next) => {
         .json({ message: "Only the host can end the session." });
     }
 
-    // Remove from Redis
     await deleteSession(code);
 
-    // Update DB record
     await prisma.connection.update({
       where: { id: session.connectionId },
       data: { status: "ENDED", endedAt: new Date() },
@@ -146,7 +141,6 @@ const endSession = async (req, res, next) => {
 };
 
 // GET /api/sessions/status/:code
-// Check session status and TTL
 const getStatus = async (req, res, next) => {
   try {
     const { code } = req.params;
@@ -159,7 +153,6 @@ const getStatus = async (req, res, next) => {
     }
 
     const ttl = await getSessionTTL(code);
-
     res.json({ session, ttl });
   } catch (err) {
     next(err);
