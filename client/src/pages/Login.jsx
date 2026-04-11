@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { ShieldAlert } from "lucide-react";
 
+const API = import.meta.env.VITE_API_URL || "http://localhost:8080/";
+
 const Logo = () => (
   <div className="inline-flex items-center justify-center w-14 h-14 md:w-16 md:h-16 rounded-2xl shadow-xl shadow-indigo-500/20 mb-4 md:mb-5 text-white transform hover:rotate-3 transition-transform duration-300">
     <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-fuchsia-600 rounded-xl flex items-center justify-center shadow-lg shadow-purple-900/40">
@@ -22,13 +24,10 @@ const InputField = ({
   <div className="w-full space-y-2">
     <div className="flex justify-between items-center">
       <label
-        className={`block text-[11px] font-bold uppercase tracking-widest ${
-          isDarkMode ? "text-slate-500" : "text-slate-400"
-        }`}
+        className={`block text-[11px] font-bold uppercase tracking-widest ${isDarkMode ? "text-slate-500" : "text-slate-400"}`}
       >
         {label}
       </label>
-
       {showForgot && (
         <button
           type="button"
@@ -38,15 +37,12 @@ const InputField = ({
         </button>
       )}
     </div>
-
     <input
       type={type}
       value={value}
       onChange={(e) => onChange(e.target.value)}
       placeholder={placeholder}
-      className={`w-full px-4 py-3 min-h-[50px] rounded-2xl border transition-all text-base font-medium focus:outline-none focus:ring-2 ${
-        type === "password" ? "tracking-[0.2em]" : ""
-      } ${
+      className={`w-full px-4 py-3 min-h-[50px] rounded-2xl border transition-all text-base font-medium focus:outline-none focus:ring-2 ${type === "password" ? "tracking-[0.2em]" : ""} ${
         isDarkMode
           ? "bg-slate-800 border-slate-700 text-white placeholder:text-slate-500 focus:ring-indigo-500/20 focus:border-indigo-500"
           : "bg-white border-slate-200 text-slate-700 placeholder:text-slate-400 focus:ring-indigo-500/10 focus:border-indigo-300"
@@ -64,14 +60,11 @@ const LoginApp = ({ isDarkMode: propDarkMode }) => {
     typeof window !== "undefined" &&
     window.matchMedia &&
     window.matchMedia("(prefers-color-scheme: dark)").matches;
-
   const stored =
     typeof window !== "undefined" ? localStorage.getItem("theme") : null;
-
   const [localDark, setLocalDark] = useState(
     stored ? stored === "dark" : prefersDark,
   );
-
   const isDark = typeof propDarkMode === "boolean" ? propDarkMode : localDark;
 
   useEffect(() => {
@@ -98,29 +91,25 @@ const LoginApp = ({ isDarkMode: propDarkMode }) => {
 
   const handleLogin = async (e) => {
     e.preventDefault();
-
     if (!email || !password) {
       setError("Please enter email and password.");
       return;
     }
-
     setIsLoading(true);
     setError("");
-
     try {
-      const res = await fetch("http://localhost:8080/api/auth/login", {
+      const res = await fetch(`${API}api/account/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
       });
-
       const data = await res.json();
-
       if (!res.ok) {
         setError(data.message || "Login failed.");
       } else {
         localStorage.setItem("accessToken", data.accessToken);
         localStorage.setItem("refreshToken", data.refreshToken);
+        localStorage.setItem("userEmail", data.user.email);
         navigate("/home", { state: { email: data.user.email } });
       }
     } catch (err) {
@@ -132,7 +121,6 @@ const LoginApp = ({ isDarkMode: propDarkMode }) => {
 
   const handleRegister = async (e) => {
     e.preventDefault();
-
     if (password !== confirmPassword) {
       setError("Passwords do not match!");
       return;
@@ -141,19 +129,15 @@ const LoginApp = ({ isDarkMode: propDarkMode }) => {
       setError("Password must be at least 8 characters.");
       return;
     }
-
     setIsLoading(true);
     setError("");
-
     try {
-      const res = await fetch("http://localhost:8080/api/auth/register", {
+      const res = await fetch(`${API}api/account/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
       });
-
       const data = await res.json();
-
       if (!res.ok) {
         setError(data.message || "Registration failed.");
       } else {
@@ -171,7 +155,7 @@ const LoginApp = ({ isDarkMode: propDarkMode }) => {
     <div
       className={`min-h-screen flex items-center justify-center px-4 sm:px-6 py-8 sm:py-12 relative ${isDark ? "bg-slate-900" : "bg-slate-50"}`}
     >
-      {/* Theme toggle - top right */}
+      {/* Theme toggle */}
       <div className="absolute top-4 right-4 md:top-6 md:right-6">
         <button
           type="button"
@@ -203,7 +187,6 @@ const LoginApp = ({ isDarkMode: propDarkMode }) => {
               >
                 <path d="M17.293 13.293A8 8 0 116.707 2.707a7 7 0 0010.586 10.586z" />
               </svg>
-              {/* FIX: was <h1>Light</h1> inside a <span>, which is invalid HTML */}
               <span className="text-xs font-semibold uppercase tracking-wider">
                 Light
               </span>
@@ -212,28 +195,24 @@ const LoginApp = ({ isDarkMode: propDarkMode }) => {
         </button>
       </div>
 
-      {/* Center column */}
       <div className="flex flex-col items-center w-full max-w-sm sm:max-w-[440px] md:max-w-[460px]">
-        {/* Brand Header */}
+        {/* Brand */}
         <div className="text-center mb-6 md:mb-10 mt-4 sm:mt-0 animate-in fade-in slide-in-from-top-4 duration-700">
           <Logo />
           <h2
-            className={`text-3xl md:text-4xl font-black mb-1 tracking-tight gap-3 ${isDark ? "text-white" : "text-slate-800"}`}
+            className={`text-3xl md:text-4xl font-black mb-1 tracking-tight ${isDark ? "text-white" : "text-slate-800"}`}
           >
             Deskmate
           </h2>
           <p
-            className={`text-[10px] md:text-[11px] font-bold uppercase tracking-[0.4em] gap-2 ${isDark ? "text-slate-500" : "text-slate-400"} p-3`}
+            className={`text-[10px] md:text-[11px] font-bold uppercase tracking-[0.4em] ${isDark ? "text-slate-500" : "text-slate-400"} p-3`}
           >
             Safe Remote Access
           </p>
         </div>
 
-        {/* Card Content */}
         <div
-          className={`relative w-full rounded-3xl shadow-lg p-6 sm:p-10 md:p-14 flex flex-col items-center overflow-hidden transition-colors duration-300 ${
-            isDark ? "bg-slate-900 border border-slate-800" : "bg-white"
-          }`}
+          className={`relative w-full rounded-3xl shadow-lg p-6 sm:p-10 md:p-14 flex flex-col items-center overflow-hidden transition-colors duration-300 ${isDark ? "bg-slate-900 border border-slate-800" : "bg-white"}`}
         >
           {view === "login" ? (
             <div className="w-full flex flex-col items-center gap-4 animate-in fade-in slide-in-from-right-4 duration-500">
@@ -262,7 +241,6 @@ const LoginApp = ({ isDarkMode: propDarkMode }) => {
                     {error}
                   </div>
                 )}
-
                 <InputField
                   label="Email Address"
                   type="email"
@@ -271,7 +249,6 @@ const LoginApp = ({ isDarkMode: propDarkMode }) => {
                   placeholder="email@example.com"
                   isDarkMode={isDark}
                 />
-
                 <InputField
                   label="Password"
                   type="password"
@@ -281,7 +258,6 @@ const LoginApp = ({ isDarkMode: propDarkMode }) => {
                   isDarkMode={isDark}
                   showForgot
                 />
-
                 <button
                   type="submit"
                   disabled={isLoading}

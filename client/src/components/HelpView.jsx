@@ -1,7 +1,8 @@
 import React from "react";
 import HelpDashboard from "./HelpDashBoard";
-const HelpView = () => {
-  return <HelpDashboard />;
+
+const HelpView = ({ onStartSession }) => {
+  return <HelpDashboard onStartSession={onStartSession} />;
 };
 
 export default HelpView;

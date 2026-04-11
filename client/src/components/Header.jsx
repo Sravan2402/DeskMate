@@ -18,16 +18,7 @@ const Header = ({ activeTab, email }) => {
         {activeTab}
       </div>
 
-      <div className="flex items-center gap-3 md:gap-6">
-        <div className="flex items-center bg-zinc-900/50 p-1 rounded-full border border-zinc-800 gap-1 h-5 w-8">
-          <button className="p-1.5 rounded-full text-zinc-600 hover:text-zinc-400">
-            <Sun size={14} />
-          </button>
-          <button className="p-1.5 rounded-full bg-purple-600 text-white shadow-lg shadow-purple-900/40">
-            <Moon size={14} />
-          </button>
-        </div>
-
+      <div className="flex items-center gap-3 md:gap-6"> 
         <div className="hidden sm:block h-6 w-[1px] bg-zinc-800" />
 
         <div className="flex items-center gap-3 cursor-pointer group">

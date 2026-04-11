@@ -21,6 +21,7 @@ io.on("connection", (socket) => {
     socket.data.code = code;
     socket.data.role = role;
     console.log(`✅ ${role} joined room: ${code}`);
+    // FIX: pass the role so the host can ignore agent joins
     socket.to(code).emit("peer-joined", { role });
   });
 
@@ -36,10 +37,12 @@ io.on("connection", (socket) => {
   socket.on("ice-candidate", ({ code, candidate }) => {
     socket.to(code).emit("ice-candidate", candidate);
   });
-  // Remote control — forward from guest to host's agent
+
+  // Remote control — relay from guest to agent (or host)
   socket.on("remote-control", ({ code, type, payload }) => {
     socket.to(code).emit("remote-control", { type, payload });
   });
+
   // Session end — notify everyone in the room
   socket.on("end-session", ({ code }) => {
     console.log("🔴 end-session:", code);
@@ -71,7 +74,6 @@ const shutdown = async (signal) => {
   console.log(`\n${signal} — shutting down...`);
   server.close(async () => {
     await prisma.$disconnect();
-    await redis.quit();
     process.exit(0);
   });
 };

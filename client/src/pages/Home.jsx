@@ -3,28 +3,52 @@ import Sidebar from "../components/Sidebar";
 import Header from "../components/Header";
 import DashboardView from "../components/DashboardView";
 import HelpView from "../components/HelpView";
-import ChatAssistant from "../components/ChatAssistant";
+import ScreenShareView from "../components/ScreenShareView";
+import { useLocation } from "react-router-dom";
 
-const Home = ({ email }) => {
+const Home = () => {
+  const location = useLocation();
+  const email =
+    location.state?.email || localStorage.getItem("userEmail") || "";
+
   const [activeTab, setActiveTab] = useState("My Computers");
-  const [isAIAssistantOpen, setIsAIAssistantOpen] = useState(false);
-  const handleNoOp = () => {
-    console.debug("Orbital Link: Signal received, standby mode.");
+
+  // session = { role, code, onEnd, guestReady }
+  const [session, setSession] = useState(null);
+
+  const startSession = (role, code, onEnd, guestReady = false) => {
+    setSession({ role, code, onEnd, guestReady });
   };
+
+  const endSession = () => setSession(null);
+
+  // ── Render ScreenShareView fullscreen when session is active ──────────────
+  if (session) {
+    return (
+      <ScreenShareView
+        role={session.role}
+        code={session.code}
+        guestReady={session.guestReady}
+        onEnd={() => {
+          session.onEnd?.();
+          endSession();
+        }}
+      />
+    );
+  }
 
   return (
     <div className="flex min-h-screen bg-[#050505] text-white overflow-hidden w-full">
       <Sidebar activeTab={activeTab} onTabChange={setActiveTab} />
 
-      {/* pt-16 on mobile to clear the fixed mobile top bar from Sidebar */}
       <main className="flex-1 flex flex-col h-screen overflow-y-auto relative pt-16 md:pt-0">
         <Header activeTab={activeTab} email={email} />
 
         <div className="flex-1 px-4 py-8 sm:px-8 sm:py-12 md:px-12 lg:px-20 relative z-10 max-w-7xl mx-auto w-full">
           {activeTab === "Help Someone" ? (
-            <HelpView />
+            <HelpView onStartSession={startSession} />
           ) : (
-            <DashboardView onAction={handleNoOp} />
+            <DashboardView onStartSession={startSession} />
           )}
 
           <div className="mt-12 opacity-10 pointer-events-none">
@@ -58,42 +82,6 @@ const Home = ({ email }) => {
           </div>
         </footer>
       </main>
-
-      <div className="fixed bottom-4 right-4 sm:bottom-8 sm:right-8 z-50">
-        <button
-          onClick={() => setIsAIAssistantOpen(!isAIAssistantOpen)}
-          className="w-12 h-12 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-br from-purple-600 to-indigo-600 flex items-center justify-center orbital-glow hover:scale-110 hover:-rotate-3 transition-all duration-300 shadow-2xl shadow-purple-900/50 group"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            className="text-white group-hover:scale-110 transition-transform sm:w-7 sm:h-7"
-          >
-            <path d="M12 8V4H8" />
-            <rect width="16" height="12" x="4" y="8" rx="2" />
-            <path d="M2 14h2" />
-            <path d="M20 14h2" />
-            <path d="M15 13v2" />
-            <path d="M9 13v2" />
-          </svg>
-        </button>
-      </div>
-
-      {isAIAssistantOpen && (
-        <ChatAssistant
-          onClose={() => setIsAIAssistantOpen(false)}
-          context={
-            activeTab === "My Computers" ? "access-disabled" : "access-enabled"
-          }
-        />
-      )}
     </div>
   );
 };

@@ -1,11 +1,11 @@
 import React from "react";
-import { Shield, Activity, Cpu, Network, Server } from "lucide-react";
+import { Shield, Activity, Cpu, Network } from "lucide-react";
 import HeroCard from "./HeroCard";
 
-const DashboardView = ({ onAction }) => {
+const DashboardView = ({ onStartSession }) => {
   return (
     <div className="space-y-8 sm:space-y-12 animate-in fade-in slide-in-from-bottom-4 duration-1000">
-      <HeroCard onAction={onAction} />
+      <HeroCard onStartSession={onStartSession} />
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
         {[
