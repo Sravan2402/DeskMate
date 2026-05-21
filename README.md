@@ -31,7 +31,28 @@ The project focuses on real-time interactions, secure backend communication, and
 ---
 
 ## 📷 Screenshots
-(Add your project screenshots here)
+## 📷 Screenshots
+
+### 🔐 Login Page
+![Login](login.jpeg)
+
+### 🖥️ Screen Sharing
+![Share Screen](share_Screen.jpeg)
+
+### 🔗 Generating Connection Code
+![Generate Code](generates_code_forconnection.jpeg)
+
+### ⏳ Connecting to Desktop
+![Connecting](connecting_to_desktop.jpeg)
+
+### ✅ Connected Successfully
+![After Connection](after_connection.jpeg)
+
+### 💻 Remote Desktop View
+![Desktop Shared](desktopshared.jpeg)
+
+### 🖥️ Active Desktop Session
+![After Connection Desktop](after_connection_desktop.jpeg)
 
 ---
 
@@ -45,6 +66,7 @@ The project focuses on real-time interactions, secure backend communication, and
 
 ## 🔗 Author
 Gajula Siri Chandana
+Sirasuvada Sravan Kumar
 
 GitHub: https://github.com/twinkle12006
 LinkedIn: https://www.linkedin.com/in/gajula-siri-chandana
