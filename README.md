@@ -45,14 +45,14 @@ The project focuses on real-time interactions, secure backend communication, and
 ### ✅ Connected Successfully
 ![After Connection](after_connection.jpeg)
 
+### 🖥️ Active Desktop Session
+![After Connection Desktop](after_connection_desktop.jpeg)
+
 ### 🖥️ Screen Sharing
 ![Share Screen](share_Screen.jpeg)
 
 ### 💻 Remote Desktop View
 ![Desktop Shared](desktopshared.jpeg)
-
-### 🖥️ Active Desktop Session
-![After Connection Desktop](after_connection_desktop.jpeg)
 
 ---
 
