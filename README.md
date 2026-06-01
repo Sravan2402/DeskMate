@@ -36,9 +36,6 @@ The project focuses on real-time interactions, secure backend communication, and
 ### 🔐 Login Page
 ![Login](login.jpeg)
 
-### 🖥️ Screen Sharing
-![Share Screen](share_Screen.jpeg)
-
 ### 🔗 Generating Connection Code
 ![Generate Code](generates_code_forconnection.jpeg)
 
@@ -48,11 +45,14 @@ The project focuses on real-time interactions, secure backend communication, and
 ### ✅ Connected Successfully
 ![After Connection](after_connection.jpeg)
 
-### 💻 Remote Desktop View
-![Desktop Shared](desktopshared.jpeg)
-
 ### 🖥️ Active Desktop Session
 ![After Connection Desktop](after_connection_desktop.jpeg)
+
+### 🖥️ Screen Sharing
+![Share Screen](share_Screen.jpeg)
+
+### 💻 Remote Desktop View
+![Desktop Shared](desktopshared.jpeg)
 
 ---
 
@@ -68,5 +68,7 @@ The project focuses on real-time interactions, secure backend communication, and
 Gajula Siri Chandana
 Sirasuvada Sravan Kumar
 
-GitHub: https://github.com/Sravan2402
-LinkedIn: https://www.linkedin.com/in/sravankumar-sirasuvada-841a97323
+GitHub: https://github.com/twinkle12006
+LinkedIn: https://www.linkedin.com/in/gajula-siri-chandana
+GitHub : https://github.com/Sravan2402
+LinkedIn : https://www.linkedin.com/in/sravankumar-sirasuvada-841a97323
