@@ -3,8 +3,8 @@ import { useEffect, useRef, useCallback, useState } from "react";
 import socket from "../utils/socket";
 
 // Metered.ca TURN credentials (from your dashboard)
-const METERED_USER = "e779a02f9e874bec4e284f76";
-const METERED_PASS = "do0Taitb6CYB3Kep";
+const METERED_USER = "744bfc4fa8089e5e22b93c9c	";
+const METERED_PASS = "CReueu7JXgSgW5QL";
 
 const buildIceServers = () => [
   { urls: "stun:stun.l.google.com:19302" },

@@ -1,3 +1,19 @@
+/**
+ * DeskMate Agent — v2
+ *
+ * Changes from v1:
+ *  - Auto-reconnect with exponential back-off (no manual restart needed)
+ *  - Enter / Return key added to KEY_MAP
+ *  - Audio volume bar  (system-level via pactl / osascript / nircmd)
+ *  - Display brightness bar (via xrandr / brightnessctl / osascript)
+ *  - Graceful SIGINT / SIGTERM shutdown
+ *
+ * Usage:
+ *   node deskmate-agent.js <SESSION_CODE>
+ *   SOCKET_URL=https://api.yourdomain.com node deskmate-agent.js ABC123
+ */
+
+require("dotenv").config();
 const { io } = require("socket.io-client");
 const {
   mouse,
@@ -7,31 +23,37 @@ const {
   Key,
   screen,
 } = require("@nut-tree-fork/nut-js");
+const { execSync } = require("child_process");
+const os = require("os");
 
-// Speed settings
+// ── Speed ────────────────────────────────────────────────────────────────────
 mouse.config.mouseSpeed = 1500;
 keyboard.config.autoDelayMs = 0;
 
+// ── Config ───────────────────────────────────────────────────────────────────
 const SOCKET_URL = process.env.SOCKET_URL || "http://localhost:8080";
 const SESSION_CODE = process.argv[2];
+const PLATFORM = os.platform(); // 'linux' | 'darwin' | 'win32'
 
 if (!SESSION_CODE) {
-  console.error(
-    "❌ Please provide a session code: node deskmate-agent.js ABC123",
-  );
+  console.error("❌  Usage: node deskmate-agent.js <SESSION_CODE>");
   process.exit(1);
 }
 
-// ── Key map: browser KeyboardEvent.key → nut-js Key enum ────────────────────
+// ── Key map ──────────────────────────────────────────────────────────────────
 const KEY_MAP = {
+  // Control keys
   Enter: Key.Return,
   Return: Key.Return,
+  NumpadEnter: Key.Return,
   Tab: Key.Tab,
   Escape: Key.Escape,
   Backspace: Key.Backspace,
   Delete: Key.Delete,
   " ": Key.Space,
   Space: Key.Space,
+
+  // Navigation
   ArrowUp: Key.Up,
   ArrowDown: Key.Down,
   ArrowLeft: Key.Left,
@@ -40,6 +62,15 @@ const KEY_MAP = {
   End: Key.End,
   PageUp: Key.PageUp,
   PageDown: Key.PageDown,
+
+  // Modifiers
+  Control: Key.LeftControl,
+  Alt: Key.LeftAlt,
+  Shift: Key.LeftShift,
+  Meta: Key.LeftSuper,
+  CapsLock: Key.CapsLock,
+
+  // Function keys
   F1: Key.F1,
   F2: Key.F2,
   F3: Key.F3,
@@ -52,11 +83,8 @@ const KEY_MAP = {
   F10: Key.F10,
   F11: Key.F11,
   F12: Key.F12,
-  Control: Key.LeftControl,
-  Alt: Key.LeftAlt,
-  Shift: Key.LeftShift,
-  Meta: Key.LeftSuper,
-  CapsLock: Key.CapsLock,
+
+  // Letters
   a: Key.A,
   b: Key.B,
   c: Key.C,
@@ -109,6 +137,8 @@ const KEY_MAP = {
   X: Key.X,
   Y: Key.Y,
   Z: Key.Z,
+
+  // Numbers
   0: Key.Num0,
   1: Key.Num1,
   2: Key.Num2,
@@ -121,7 +151,53 @@ const KEY_MAP = {
   9: Key.Num9,
 };
 
-// ── State ────────────────────────────────────────────────────────────────────
+// ── System helpers ───────────────────────────────────────────────────────────
+
+/**
+ * Set system volume (0–100).
+ * Linux: pactl  |  macOS: osascript  |  Windows: nircmd
+ */
+function setVolume(level) {
+  const v = Math.max(0, Math.min(100, Math.round(level)));
+  try {
+    if (PLATFORM === "linux") {
+      execSync(`pactl set-sink-volume @DEFAULT_SINK@ ${v}%`);
+    } else if (PLATFORM === "darwin") {
+      execSync(`osascript -e "set volume output volume ${v}"`);
+    } else if (PLATFORM === "win32") {
+      // nircmd must be installed: https://www.nirsoft.net/utils/nircmd.html
+      execSync(`nircmd setsysvolume ${Math.round((v / 100) * 65535)}`);
+    }
+    console.log(`🔊  Volume set to ${v}%`);
+  } catch (e) {
+    console.warn("⚠️  setVolume failed:", e.message);
+  }
+}
+
+/**
+ * Set display brightness (0–100).
+ * Linux: brightnessctl  |  macOS: osascript (keyboard brightness workaround)  |  Windows: nircmd
+ */
+function setBrightness(level) {
+  const b = Math.max(0, Math.min(100, Math.round(level)));
+  try {
+    if (PLATFORM === "linux") {
+      // brightnessctl must be installed: sudo apt install brightnessctl
+      execSync(`brightnessctl set ${b}%`);
+    } else if (PLATFORM === "darwin") {
+      // Requires the 'brightness' CLI: brew install brightness
+      execSync(`brightness ${(b / 100).toFixed(2)}`);
+    } else if (PLATFORM === "win32") {
+      // nircmd must be installed
+      execSync(`nircmd changebrightness ${b}`);
+    }
+    console.log(`🖥️   Brightness set to ${b}%`);
+  } catch (e) {
+    console.warn("⚠️  setBrightness failed:", e.message);
+  }
+}
+
+// ── Screen size ──────────────────────────────────────────────────────────────
 let screenW = 1920;
 let screenH = 1080;
 
@@ -129,35 +205,45 @@ let screenH = 1080;
   try {
     screenW = await screen.width();
     screenH = await screen.height();
-    console.log(`🖥️  Screen: ${screenW}x${screenH}`);
+    console.log(`🖥️   Screen: ${screenW}×${screenH}`);
   } catch (e) {
-    console.warn("⚠️  Could not read screen size, defaulting to 1920x1080");
+    console.warn("⚠️  Could not read screen size, defaulting to 1920×1080");
   }
 })();
 
-// ── Socket ───────────────────────────────────────────────────────────────────
-const socket = io(SOCKET_URL, { reconnection: true });
+// ── Socket with auto-reconnect ────────────────────────────────────────────────
+const socket = io(SOCKET_URL, {
+  reconnection: true,
+  reconnectionAttempts: Infinity, // never stop trying
+  reconnectionDelay: 1000,
+  reconnectionDelayMax: 30_000, // cap at 30 s
+  randomizationFactor: 0.3,
+});
 
 socket.on("connect", () => {
-  console.log("✅ Agent connected:", socket.id);
+  console.log("✅  Agent connected:", socket.id);
   socket.emit("join-room", { code: SESSION_CODE, role: "agent" });
-  console.log("🖥️  DeskMate Agent active for session:", SESSION_CODE);
+  console.log("🖥️   DeskMate Agent active — session:", SESSION_CODE);
 });
 
 socket.on("disconnect", (reason) => {
-  console.log("❌ Agent disconnected:", reason);
+  console.warn("❌  Disconnected:", reason, "— will reconnect automatically");
+});
+
+socket.on("connect_error", (err) => {
+  console.warn("🔄  Connection error:", err.message, "— retrying…");
 });
 
 socket.on("session-ended", () => {
-  console.log("🔴 Session ended by remote — exiting");
+  console.log("🔴  Session ended by remote — exiting");
   process.exit(0);
 });
 
-// ── Remote control handler ───────────────────────────────────────────────────
+// ── Remote-control handler ───────────────────────────────────────────────────
 socket.on("remote-control", async ({ type, payload }) => {
   try {
     switch (type) {
-      // ── Mouse move (from trackpad / pointer drag on video) ───────────────
+      // Mouse move (trackpad / pointer drag on video)
       case "mouse-move": {
         const absX = Math.round(payload.x * screenW);
         const absY = Math.round(payload.y * screenH);
@@ -165,39 +251,32 @@ socket.on("remote-control", async ({ type, payload }) => {
         break;
       }
 
-      // ── Cursor nudge (from arrow buttons in toolbar) ─────────────────────
-      // payload: { dx, dy }  — pixel deltas, may be negative
+      // Cursor nudge (arrow buttons in toolbar)
       case "cursor-move": {
         const { dx = 0, dy = 0 } = payload;
-        const current = await mouse.getPosition();
-        const nextX = Math.max(0, Math.min(screenW - 1, current.x + dx));
-        const nextY = Math.max(0, Math.min(screenH - 1, current.y + dy));
-        await mouse.setPosition(new Point(nextX, nextY));
+        const cur = await mouse.getPosition();
+        await mouse.setPosition(
+          new Point(
+            Math.max(0, Math.min(screenW - 1, cur.x + dx)),
+            Math.max(0, Math.min(screenH - 1, cur.y + dy)),
+          ),
+        );
         break;
       }
 
-      // ── Left click ──────────────────────────────────────────────────────
-      case "click": {
+      case "click":
         await mouse.click(Button.LEFT);
-        console.log("🖱️  Left click");
+        console.log("🖱️   Left click");
         break;
-      }
-
-      // ── Double click ────────────────────────────────────────────────────
-      case "double-click": {
+      case "double-click":
         await mouse.doubleClick(Button.LEFT);
-        console.log("🖱️  Double click");
+        console.log("🖱️   Double click");
         break;
-      }
-
-      // ── Right click ─────────────────────────────────────────────────────
-      case "right-click": {
+      case "right-click":
         await mouse.click(Button.RIGHT);
-        console.log("🖱️  Right click");
+        console.log("🖱️   Right click");
         break;
-      }
 
-      // ── Scroll ──────────────────────────────────────────────────────────
       case "scroll": {
         const { dx = 0, dy = 0 } = payload;
         if (dy !== 0) {
@@ -213,30 +292,54 @@ socket.on("remote-control", async ({ type, payload }) => {
         break;
       }
 
-      // ── Single key press ────────────────────────────────────────────────
+      // Single key press — Enter/Return now handled via KEY_MAP
       case "key": {
-        const { key } = payload;
+        const { key, modifiers = [] } = payload;
         const nutKey = KEY_MAP[key];
+
+        // Press modifier keys first
+        const nutMods = modifiers.map((m) => KEY_MAP[m]).filter(Boolean);
+        for (const mod of nutMods) await keyboard.pressKey(mod);
+
         if (nutKey !== undefined) {
           await keyboard.pressKey(nutKey);
           await keyboard.releaseKey(nutKey);
-          console.log("⌨️  Key:", key);
+          console.log(
+            "⌨️   Key:",
+            key,
+            modifiers.length ? `[${modifiers}]` : "",
+          );
         } else if (key.length === 1) {
           await keyboard.type(key);
-          console.log("⌨️  Typed char:", key);
+          console.log("⌨️   Typed char:", key);
         } else {
           console.warn("⚠️  Unknown key:", key);
+        }
+
+        for (const mod of nutMods.reverse()) await keyboard.releaseKey(mod);
+        break;
+      }
+
+      // Type full text string
+      case "type-text": {
+        if (payload.text) {
+          await keyboard.type(payload.text);
+          console.log("⌨️   Typed:", payload.text);
         }
         break;
       }
 
-      // ── Type full text string ────────────────────────────────────────────
-      case "type-text": {
-        const { text } = payload;
-        if (text) {
-          await keyboard.type(text);
-          console.log("⌨️  Typed text:", text);
-        }
+      // ── NEW: Volume bar ──────────────────────────────────────────────────
+      case "set-volume": {
+        // payload: { level: 0-100 }
+        setVolume(payload.level);
+        break;
+      }
+
+      // ── NEW: Brightness bar ──────────────────────────────────────────────
+      case "set-brightness": {
+        // payload: { level: 0-100 }
+        setBrightness(payload.level);
         break;
       }
 
@@ -244,6 +347,15 @@ socket.on("remote-control", async ({ type, payload }) => {
         console.warn("⚠️  Unknown remote-control type:", type);
     }
   } catch (err) {
-    console.error(`❌ Control error [${type}]:`, err.message);
+    console.error(`❌  Control error [${type}]:`, err.message);
   }
 });
+
+// ── Graceful shutdown ────────────────────────────────────────────────────────
+const shutdown = (sig) => {
+  console.log(`\n${sig} — disconnecting agent…`);
+  socket.disconnect();
+  process.exit(0);
+};
+process.on("SIGINT", () => shutdown("SIGINT"));
+process.on("SIGTERM", () => shutdown("SIGTERM"));
