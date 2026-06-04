@@ -8,24 +8,26 @@ const PORT = process.env.PORT || 8080;
 const server = http.createServer(app);
 
 const io = new Server(server, {
-  cors: { origin: "*" },
+  cors: {
+    origin: process.env.ALLOWED_ORIGINS?.split(",").map((o) => o.trim()) || [
+      "http://localhost:5173",
+    ],
+    methods: ["GET", "POST"],
+  },
 });
 
 // ── Socket.io — WebRTC signaling only ────────────────────────────────────────
 io.on("connection", (socket) => {
   console.log("🔌 Socket connected:", socket.id);
 
-  // Host or guest joins a room by session code
   socket.on("join-room", ({ code, role }) => {
     socket.join(code);
     socket.data.code = code;
     socket.data.role = role;
     console.log(`✅ ${role} joined room: ${code}`);
-    // FIX: pass the role so the host can ignore agent joins
     socket.to(code).emit("peer-joined", { role });
   });
 
-  // WebRTC screen share signaling
   socket.on("offer", ({ code, offer }) => {
     socket.to(code).emit("offer", offer);
   });
@@ -38,19 +40,16 @@ io.on("connection", (socket) => {
     socket.to(code).emit("ice-candidate", candidate);
   });
 
-  // Remote control — relay from guest to agent (or host)
   socket.on("remote-control", ({ code, type, payload }) => {
     socket.to(code).emit("remote-control", { type, payload });
   });
 
-  // Session end — notify everyone in the room
   socket.on("end-session", ({ code }) => {
     console.log("🔴 end-session:", code);
     socket.to(code).emit("session-ended");
     io.socketsLeave(code);
   });
 
-  // If a peer disconnects unexpectedly, notify the other side
   socket.on("disconnect", () => {
     const { code, role } = socket.data || {};
     if (code) {
@@ -74,6 +73,7 @@ const shutdown = async (signal) => {
   console.log(`\n${signal} — shutting down...`);
   server.close(async () => {
     await prisma.$disconnect();
+    await redis.disconnect?.();
     process.exit(0);
   });
 };

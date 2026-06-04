@@ -7,8 +7,6 @@ const {
   getSessionTTL,
 } = require("../config/redis");
 
-// Generate a random 6-char alphanumeric code (A-Z, 0-9)
-// Excludes easily confused chars: 0/O, 1/I/L
 const CHARSET = "ABCDEFGHJKMNPQRSTUVWXYZ23456789";
 const generateCode = () =>
   Array.from(
@@ -118,13 +116,19 @@ const endSession = async (req, res, next) => {
 
     const session = await getSession(code);
     if (!session) {
-      return res.status(404).json({ message: "Session not found." });
+      // Session already gone (expired or already ended) — treat as success
+      return res.json({ message: "Session already ended." });
     }
 
-    if (session.hostUserId !== userId) {
+    // FIX: allow both host AND guest to end the session
+    // (guest calls this on disconnect too)
+    const isParticipant =
+      session.hostUserId === userId || session.guestUserId === userId;
+
+    if (!isParticipant) {
       return res
         .status(403)
-        .json({ message: "Only the host can end the session." });
+        .json({ message: "Not a participant of this session." });
     }
 
     await deleteSession(code);

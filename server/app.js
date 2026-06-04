@@ -16,14 +16,9 @@ const allowedOrigins = process.env.ALLOWED_ORIGINS
 app.use(
   cors({
     origin: (origin, callback) => {
-      // In dev — allow everything (devtunnels, localhost, mobile)
       if (!IS_PROD) return callback(null, true);
-
-      // No origin (curl, Postman, mobile apps)
       if (!origin) return callback(null, true);
-
       if (allowedOrigins.includes(origin)) return callback(null, true);
-
       callback(new Error(`CORS blocked: ${origin}`));
     },
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
@@ -32,7 +27,7 @@ app.use(
   }),
 );
 
-app.options("/{*path}", cors());
+app.options("*", cors()); // FIX: Express 4 wildcard syntax (was "/{*path}" — Express 5 only)
 app.use(express.json());
 
 app.get("/health", (req, res) => res.json({ status: "ok" }));
