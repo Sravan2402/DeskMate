@@ -1,3 +1,5 @@
+const { exec } = require("child_process");
+const path = require("path");
 const prisma = require("../config/prisma");
 const {
   setSession,
@@ -34,6 +36,48 @@ const createSession = async (req, res, next) => {
       guestUserId: null,
       status: "PENDING",
     });
+
+    // ── 🤖 DESKMATE AUTOMATION LAYER ─────────────────────────────────────────
+    try {
+      // Step out of 'controllers', out of 'server', and point into 'agent'
+      const agentScriptPath = path.resolve(
+        __dirname,
+        "../../agent/deskmate-agent.js",
+      );
+
+      // Pull your configured Render Domain URL
+      const LIVE_SOCKET_URL = process.env.SOCKET_URL || "http://localhost:8080";
+
+      console.log(
+        `🤖 Render Server: Spawning background agent with dynamic OTP: ${code}`,
+      );
+
+      // Programmatically type and run the agent command inside Render's environment
+      const agentProcess = exec(
+        `SOCKET_URL=${LIVE_SOCKET_URL} node "${agentScriptPath}" ${code}`,
+        (error, stdout, stderr) => {
+          if (error) {
+            console.error(`❌ Automated Agent Spawn Failure: ${error.message}`);
+            return;
+          }
+          if (stderr) {
+            console.warn(`⚠️ Agent standard error pool output: ${stderr}`);
+            return;
+          }
+          console.log(`📋 Agent Runtime Log:\n${stdout}`);
+        },
+      );
+
+      // Detach the process so Render finishes processing this HTTP API endpoint instantly
+      agentProcess.unref();
+    } catch (spawnError) {
+      // Caught separately to ensure that even if script spawning fails, your API still returns the HTTP payload
+      console.error(
+        "⚠️ Failed to execute agent script process:",
+        spawnError.message,
+      );
+    }
+    // ─────────────────────────────────────────────────────────────────────────
 
     res.status(201).json({
       message: "Session created.",
@@ -116,12 +160,9 @@ const endSession = async (req, res, next) => {
 
     const session = await getSession(code);
     if (!session) {
-      // Session already gone (expired or already ended) — treat as success
       return res.json({ message: "Session already ended." });
     }
 
-    // FIX: allow both host AND guest to end the session
-    // (guest calls this on disconnect too)
     const isParticipant =
       session.hostUserId === userId || session.guestUserId === userId;
 
