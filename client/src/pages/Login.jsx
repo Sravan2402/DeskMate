@@ -98,6 +98,7 @@ const LoginApp = ({ isDarkMode: propDarkMode }) => {
     setIsLoading(true);
     setError("");
     try {
+      // FIXED: Added forward slash before /api
       const res = await fetch(`${API}/api/account/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -132,6 +133,7 @@ const LoginApp = ({ isDarkMode: propDarkMode }) => {
     setIsLoading(true);
     setError("");
     try {
+      // FIXED: Added forward slash before /api
       const res = await fetch(`${API}/api/account/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -155,7 +157,6 @@ const LoginApp = ({ isDarkMode: propDarkMode }) => {
     <div
       className={`min-h-screen flex items-center justify-center px-4 sm:px-6 py-8 sm:py-12 relative ${isDark ? "bg-slate-900" : "bg-slate-50"}`}
     >
-      {/* Theme toggle */}
       <div className="absolute top-4 right-4 md:top-6 md:right-6">
         <button
           type="button"
@@ -196,7 +197,6 @@ const LoginApp = ({ isDarkMode: propDarkMode }) => {
       </div>
 
       <div className="flex flex-col items-center w-full max-w-sm sm:max-w-[440px] md:max-w-[460px]">
-        {/* Brand */}
         <div className="text-center mb-6 md:mb-10 mt-4 sm:mt-0 animate-in fade-in slide-in-from-top-4 duration-700">
           <Logo />
           <h2
