@@ -24,10 +24,12 @@ app.use(
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true,
+    // Add these lines to handle preflight automatically:
+    preflightContinue: false,
+    optionsSuccessStatus: 204,
   }),
 );
 
-app.options("/*", cors()); // FIX: Express 4 wildcard syntax (was "/{*path}" — Express 5 only)
 app.use(express.json());
 
 app.get("/health", (req, res) => res.json({ status: "ok" }));
