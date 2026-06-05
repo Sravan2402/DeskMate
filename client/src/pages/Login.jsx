@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { ShieldAlert } from "lucide-react";
 
-const API = import.meta.env.VITE_API_URL || "http://localhost:8080/";
+const API = import.meta.env.VITE_API_URL;
 
 const Logo = () => (
   <div className="inline-flex items-center justify-center w-14 h-14 md:w-16 md:h-16 rounded-2xl shadow-xl shadow-indigo-500/20 mb-4 md:mb-5 text-white transform hover:rotate-3 transition-transform duration-300">
@@ -98,7 +98,7 @@ const LoginApp = ({ isDarkMode: propDarkMode }) => {
     setIsLoading(true);
     setError("");
     try {
-      const res = await fetch(`${API}api/account/login`, {
+      const res = await fetch(`${API}/api/account/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
@@ -132,7 +132,7 @@ const LoginApp = ({ isDarkMode: propDarkMode }) => {
     setIsLoading(true);
     setError("");
     try {
-      const res = await fetch(`${API}api/account/register`, {
+      const res = await fetch(`${API}/api/account/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
