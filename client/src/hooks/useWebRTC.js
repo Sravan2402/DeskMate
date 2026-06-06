@@ -35,7 +35,17 @@ const buildIceServers = () => [
   },
 ];
 
-const ICE_SERVERS = { iceServers: buildIceServers(), iceCandidatePoolSize: 10 };
+// Temporarily change your RTCPeerConnection config to this:
+const ICE_SERVERS = {
+  iceServers: [
+    {
+      urls: "turn:a.relay.metered.ca:443", // Only use the TLS relay
+      username: METERED_USER,
+      credential: METERED_PASS,
+    },
+  ],
+  iceTransportPolicy: "relay", // <--- This forces WebRTC to ONLY use TURN
+};
 
 const canScreenShare = () =>
   typeof navigator !== "undefined" &&
