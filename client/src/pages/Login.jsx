@@ -99,7 +99,7 @@ const LoginApp = ({ isDarkMode: propDarkMode }) => {
     setError("");
     try {
       // FIXED: Added forward slash before /api
-      const res = await fetch(`${API}/api/account/login`, {
+      const res = await fetch(`${API}api/account/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
@@ -134,7 +134,7 @@ const LoginApp = ({ isDarkMode: propDarkMode }) => {
     setError("");
     try {
       // FIXED: Added forward slash before /api
-      const res = await fetch(`${API}/api/account/register`, {
+      const res = await fetch(`${API}api/account/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),

@@ -16,7 +16,7 @@ const HeroCard = ({ onStartSession }) => {
   const onGenerateCode = async () => {
     setIsLoading(true);
     try {
-      const res = await fetch(`${API}/api/sessions/create`, {
+      const res = await fetch(`${API}api/sessions/create`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -77,7 +77,7 @@ const HeroCard = ({ onStartSession }) => {
     const c = sessionCode || code;
     try {
       if (c) {
-        await fetch(`${API}/api/sessions/end`, {
+        await fetch(`${API}api/sessions/end`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
