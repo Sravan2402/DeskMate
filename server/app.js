@@ -6,7 +6,7 @@ const authRoutes = require("./routes/auth");
 const sessionRoutes = require("./routes/sessions");
 
 const app = express();
-
+app.set("trust proxy", 1);
 const IS_PROD = process.env.NODE_ENV === "production";
 
 const allowedOrigins = process.env.ALLOWED_ORIGINS
